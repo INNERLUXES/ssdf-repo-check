@@ -1,0 +1,49 @@
+{
+  "name": "ssdf-repo-check",
+  "version": "1.0.0",
+  "description": "Looks through a repository for evidence of the secure development practices in NIST SP 800-218 (SSDF 1.1) and reports it per practice, as text, Markdown, JSON or SARIF.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "bin": {
+    "ssdf-repo-check": "bin/ssdf-repo-check.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "test:coverage": "node --test --experimental-test-coverage \"test/*.test.js\"",
+    "check": "node tools/check.mjs",
+    "self-scan": "node bin/ssdf-repo-check.js . --verbose",
+    "example:compare": "node examples/compare.mjs",
+    "example:gate": "node examples/gate.mjs"
+  },
+  "keywords": [
+    "ssdf",
+    "nist-sp-800-218",
+    "secure-software-development",
+    "software-supply-chain",
+    "sbom",
+    "sarif",
+    "devsecops",
+    "security-audit",
+    "cli"
+  ],
+  "author": "INNERLUXES <info@innerluxes.dev>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/INNERLUXES/ssdf-repo-check.git"
+  },
+  "homepage": "https://innerluxes.dev/software-development"
+}
