@@ -1,0 +1,66 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install from the lock file
+        run: npm ci
+      - name: Repository checks
+        run: npm run check
+      - name: Tests
+        run: npm test
+      - name: Examples
+        run: |
+          npm run example:compare
+          npm run example:gate
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+      - name: Tests with coverage
+        run: npm run test:coverage
+
+  # The tool checks its own repository and fails the build if a practice it can see in full has no evidence.
+  ssdf:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+      - name: SSDF report in the job summary
+        run: node bin/ssdf-repo-check.js . --format markdown >> "$GITHUB_STEP_SUMMARY"
+      - name: SARIF for code scanning
+        run: node bin/ssdf-repo-check.js . --format sarif --output ssdf.sarif
+      - uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        if: github.event_name == 'push'
+        with:
+          sarif_file: ssdf.sarif
+          category: ssdf-repo-check
+      - name: Gate
+        run: node bin/ssdf-repo-check.js . --require-all --fail-on-problem

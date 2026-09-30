@@ -1,0 +1,6 @@
+# Every change is reviewed by a maintainer.
+* @innerluxesdev
+
+# The practice list and the credential patterns decide what the tool reports; changes need extra care.
+/src/practices.js @innerluxesdev
+/src/checks/secrets.js @innerluxesdev
